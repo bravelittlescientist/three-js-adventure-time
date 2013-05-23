@@ -14,27 +14,35 @@ var sun = {
 // Planet radii, distances, masses in km
 var bodies_data = {
     "mercury"   : {
-        "radius" : 2439.7                
+        "radius"    : 2439.7,
+        "fromSun"   : 57909227
     },
     "venus"     : {
-        "radius" : 6051.8
+        "radius" : 6051.8,
+        "fromSun" : 108209475
     },
     "earth"     : {
+        "fromSun" : 149598262,
         "radius" : 6371
     },
     "mars"      : {
-        "radius" : 3389.5
+        "radius" : 3389.5,
+        "fromSun" : 227943824
     },
     "jupiter"   : {
+        "fromSun" : 778340821,
         "radius" : 69911
     },
     "saturn"    : {
+        "fromSun" : 1426666422,
         "radius" : 58232
     },
     "uranus"    : {
+        "fromSun" : 2870658186,
         "radius" : 25362
     },
     "neptune"   : {
+        "fromSun" : 4498396441,
         "radius" : 24622
     }
 };
@@ -58,8 +66,15 @@ function render() {
    
     sun["display"].rotation.x += 10;
     sun["display"].rotation.y += 10;
-    //controller["sphere"].rotation.x += 0.1; 
-    //controller["sphere"].rotation.y += 0.1;
+
+    var multiplier = 1;
+    for (body in bodies) {
+        bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
+        bodies[body].position.z = Math.floor((Math.random()*100) - 50);
+        multiplier += 1;
+    }
+
+
 
     // Animation Ends
 
@@ -89,13 +104,14 @@ function createBodies() {
         ),
         new THREE.MeshLambertMaterial( { color : 0xFFB00F } )
     );
-    sun["display"].position.x = -window.innerWidth/2 ;
+    sun["display"].position.x = 0;
     sun["display"].position.y = 0;
+    sun["display"].position.z = 0;
     controller["scene"].add(sun["display"]);
     var sunPL = new THREE.PointLight(0xFFFFFF);
-    sunPL.position.x = -window.innerWidth/2;
+    sunPL.position.x = 10;
     sunPL.position.y = 10;
-    sunPL.position.z = 130;
+    sunPL.position.z = 530;
     controller["scene"].add( sunPL );
 
     // Create planets
@@ -110,7 +126,7 @@ function createBodies() {
             ),
             new THREE.MeshLambertMaterial( { color : 0x00FF00 } )
         );
-        bodies[planet].position.x = 0;// -window.innerWidth/2 + sun["radius"]*2 + 600;
+        bodies[planet].position.x = counter * 100;// -window.innerWidth/2 + sun["radius"]*2 + 600;
         controller["scene"].add( bodies[planet] );
         counter += 1;
     }

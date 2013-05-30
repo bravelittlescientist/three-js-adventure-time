@@ -49,11 +49,6 @@ var bodies_data = {
 
 var bodies = {};
 
-function init() {
-    // Load scene, camera, renderer
-    createScene();
-}
-
 init();
 
 // render
@@ -69,12 +64,10 @@ function render() {
 
     var multiplier = 1;
     for (body in bodies) {
-        bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
-        bodies[body].position.z = Math.floor((Math.random()*100) - 50);
+        //bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
+        //bodies[body].position.z = Math.floor((Math.random()*100) - 50);
         multiplier += 1;
     }
-
-
 
     // Animation Ends
 
@@ -96,37 +89,39 @@ function createBodies() {
     }
 
     // Create sun
+    var adjustment = window.innerWidth/naiveSolarSystemWidth * sun["radius"]/5;
     sun["display"] = new THREE.Mesh(
         new THREE.SphereGeometry(
-            (sun["radius"]/5)*(window.innerWidth/naiveSolarSystemWidth),
+            adjustment,
             40,
             40
         ),
         new THREE.MeshLambertMaterial( { color : 0xFFB00F } )
     );
-    sun["display"].position.x = 0;
-    sun["display"].position.y = 0;
-    sun["display"].position.z = 0;
+    sun["display"].position.set(-1 * window.innerWidth/2, 0, 0);
+    
     controller["scene"].add(sun["display"]);
     var sunPL = new THREE.PointLight(0xFFFFFF);
-    sunPL.position.x = 10;
+    sunPL.position.x = window.innerWidth/2*-1;
     sunPL.position.y = 10;
     sunPL.position.z = 530;
     controller["scene"].add( sunPL );
 
     // Create planets
     var counter = 1;
+    var placeholder = (-1*window.innerWidth/2) + adjustment + 25;
+
     for (planet in bodies_data) {
         var displayRadius = bodies_data[planet]["radius"]*(window.innerWidth/naiveSolarSystemWidth)
         bodies[planet] = new THREE.Mesh(
             new THREE.SphereGeometry(
-                displayRadius/5,
+                45,//displayRadius*2,
                 16,
                 16
             ),
             new THREE.MeshLambertMaterial( { color : 0x00FF00 } )
         );
-        bodies[planet].position.x = counter * 100;// -window.innerWidth/2 + sun["radius"]*2 + 600;
+        bodies[planet].position.x = (counter * 150) + placeholder;// -window.innerWidth/2 + sun["radius"]*2 + 600;
         controller["scene"].add( bodies[planet] );
         counter += 1;
     }
@@ -136,37 +131,27 @@ function createBodies() {
 // createScene
 // Loads a THREE.js scene, perspective camera, and renderer into canvas.
 // Currently adds a sphere
-function createScene () {
+function init () {
+
+    // Scene
     controller["scene"] = new THREE.Scene(); 
+    
+    // Camera
     controller["camera"] = new THREE.PerspectiveCamera( 
-        45, window.innerWidth / window.innerHeight, 1, 10000
+        45, window.innerWidth / window.innerHeight, 0.1, 20000
     );  
+    controller["camera"].position.set(0, 150, 1000);
+    controller["camera"].lookAt(controller["scene"].position);
+
+    // Renderer
     controller["renderer"] = new THREE.WebGLRenderer(); 
     controller["renderer"].setSize( window.innerWidth, window.innerHeight );  
-    controller["camera"].position.z = 1000;
     document.body.appendChild( controller["renderer"].domElement );
-   
-    createBodies();
-    /*var geo = new THREE.SphereGeometry(
-        50, 
-        16, 
-        16  
-    );
-    var mat = new THREE.MeshLambertMaterial( { color: 0x00FF00 } );
-    controller["sphere"] = new THREE.Mesh(
-        geo, mat
-    );
-    controller["sphere"].geometry.dynamic = true;
-    controller["sphere"].geometry.verticesNeedUpdate = true;
-    controller["sphere"].geometry.normalsNeedUpdate = true;
-    controller["scene"].add( controller["sphere"] );*/
-
-    var ambientLight = new THREE.AmbientLight(0xFFFFFF);
-    //controller["scene"].add(ambientLight);
-
+  
+    // Light Sources and Starfield
     var pointLight = new THREE.PointLight(0xFFFFFF);
-    pointLight.position.x = 10;
-    pointLight.position.y = 10;
-    pointLight.position.z = 130;
+    pointLight.position.set(0, 150, 100);
     controller["scene"].add( pointLight );
+    
+    createBodies();
 }

@@ -123,7 +123,7 @@ function createBodies() {
         ),
         sunMaterial
     );
-    sun["display"].position.set(-1 * window.innerWidth/2, 0, 0);
+    sun["display"].position.set(-1 * window.innerWidth/2, -1 * window.innerHeight/2 + 50, 0);
     
     controller["scene"].add(sun["display"]);
     var sunPL = new THREE.PointLight(0xFFFFFF);

@@ -8,42 +8,51 @@ var controller = {
 
 // Sun radius in km, 1 R
 var sun = {
-    "radius" : 695500
+    "radius" : 695500,
+    "texture" : "img/sun.jpg"
 }
 
 // Planet radii, distances, masses in km
 var bodies_data = {
     "mercury"   : {
         "radius"    : 2439.7,
-        "fromSun"   : 57909227
+        "fromSun"   : 57909227,
+        "texture"   : "img/mercury.jpg"
     },
     "venus"     : {
         "radius" : 6051.8,
-        "fromSun" : 108209475
+        "fromSun" : 108209475,
+        "texture"   : "img/venus.jpg"
     },
     "earth"     : {
         "fromSun" : 149598262,
-        "radius" : 6371
+        "radius" : 6371,
+        "texture"   : "img/earth.jpg"
     },
     "mars"      : {
         "radius" : 3389.5,
-        "fromSun" : 227943824
+        "fromSun" : 227943824,
+        "texture"   : "img/mars.jpg"
     },
     "jupiter"   : {
         "fromSun" : 778340821,
-        "radius" : 69911
+        "radius" : 69911,
+        "texture"   : "img/jupiter.jpg"
     },
     "saturn"    : {
         "fromSun" : 1426666422,
-        "radius" : 58232
+        "radius" : 58232,
+        "texture"   : "img/saturn.jpg"
     },
     "uranus"    : {
         "fromSun" : 2870658186,
-        "radius" : 25362
+        "radius" : 25362,
+        "texture"   : "img/uranus.jpg"
     },
     "neptune"   : {
         "fromSun" : 4498396441,
-        "radius" : 24622
+        "radius" : 24622,
+        "texture"   : "img/neptune.jpg"
     }
 };
 
@@ -59,11 +68,13 @@ function render() {
 
     // Animation Starts
    
-    sun["display"].rotation.x += 10;
-    sun["display"].rotation.y += 10;
+    sun["display"].rotation.x += 0.01;
+    sun["display"].rotation.y += 0.01;
 
     var multiplier = 1;
     for (body in bodies) {
+        bodies[body].rotation.x += 0.01;
+        bodies[body].rotation.y += 0.01;
         //bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
         //bodies[body].position.z = Math.floor((Math.random()*100) - 50);
         multiplier += 1;
@@ -89,6 +100,8 @@ function createBodies() {
     }
 
     // Create sun
+    var sunTexture = THREE.ImageUtils.loadTexture( sun["texture"] );
+    var sunMaterial = new THREE.MeshBasicMaterial( { map: sunTexture } );
     var adjustment = window.innerWidth/naiveSolarSystemWidth * sun["radius"]/5;
     sun["display"] = new THREE.Mesh(
         new THREE.SphereGeometry(
@@ -96,7 +109,7 @@ function createBodies() {
             40,
             40
         ),
-        new THREE.MeshLambertMaterial( { color : 0xFFB00F } )
+        sunMaterial
     );
     sun["display"].position.set(-1 * window.innerWidth/2, 0, 0);
     
@@ -112,6 +125,8 @@ function createBodies() {
     var placeholder = (-1*window.innerWidth/2) + adjustment + 25;
 
     for (planet in bodies_data) {
+        var planetTexture = THREE.ImageUtils.loadTexture( bodies_data[planet]["texture"] );
+        var planetMaterial = new THREE.MeshBasicMaterial( { map: planetTexture } );
         var displayRadius = bodies_data[planet]["radius"]*(window.innerWidth/naiveSolarSystemWidth)
         bodies[planet] = new THREE.Mesh(
             new THREE.SphereGeometry(
@@ -119,7 +134,7 @@ function createBodies() {
                 16,
                 16
             ),
-            new THREE.MeshLambertMaterial( { color : 0x00FF00 } )
+            planetMaterial
         );
         bodies[planet].position.x = (counter * 150) + placeholder;// -window.innerWidth/2 + sun["radius"]*2 + 600;
         controller["scene"].add( bodies[planet] );

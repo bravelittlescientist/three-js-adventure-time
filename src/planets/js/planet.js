@@ -12,6 +12,11 @@ var sun = {
     "texture" : "img/sun.jpg"
 }
 
+var rings = {
+    "saturn" : null,
+    "uranus" : null
+};
+
 // Planet radii, distances, masses in km
 var bodies_data = {
     "mercury"   : {
@@ -72,14 +77,21 @@ function render() {
     sun["display"].rotation.y += 0.01;
 
     var multiplier = 1;
+
     for (body in bodies) {
         bodies[body].rotation.x += 0.01;
         bodies[body].rotation.y += 0.01;
+        
         //bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
         //bodies[body].position.z = Math.floor((Math.random()*100) - 50);
         multiplier += 1;
     }
 
+    rings["uranus"].rotation.x += 0.01;
+    rings["uranus"].rotation.z += 0.01;
+    rings["saturn"].rotation.x += 0.01;
+    rings["saturn"].rotation.y -= 0.01;
+    
     // Animation Ends
 
     controller["renderer"].render(
@@ -120,13 +132,30 @@ function createBodies() {
     sunPL.position.z = 530;
     controller["scene"].add( sunPL );
 
-    // Create planets
+    // Create planets and rings
     var counter = 1;
     var placeholder = (-1*window.innerWidth/2) + adjustment + 25;
 
+    // Saturn's Rings
+    var saturnRingTexture = THREE.ImageUtils.loadTexture( "img/saturnrings.jpg" );
+    var uranusRingTexture = THREE.ImageUtils.loadTexture( "img/uranusrings.jpg" );
+    var saturnRingMaterial = new THREE.MeshLambertMaterial( { map : saturnRingTexture } );
+    var uranusRingMaterial = new THREE.MeshLambertMaterial( { map : uranusRingTexture } );
+
+    rings["saturn"] = new THREE.Mesh(
+        new THREE.CylinderGeometry(65,65,2,50,50,false), 
+        saturnRingMaterial
+    );
+    rings["saturn"].overdraw = true;
+    rings["uranus"] = new THREE.Mesh(
+        new THREE.CylinderGeometry(60, 60, 2, 50, 50, false),
+        uranusRingMaterial
+    );
+    rings["uranus"].overdraw = true;
+
     for (planet in bodies_data) {
         var planetTexture = THREE.ImageUtils.loadTexture( bodies_data[planet]["texture"] );
-        var planetMaterial = new THREE.MeshBasicMaterial( { map: planetTexture } );
+        var planetMaterial = new THREE.MeshLambertMaterial( { map: planetTexture } );
         var displayRadius = bodies_data[planet]["radius"]*(window.innerWidth/naiveSolarSystemWidth)
         bodies[planet] = new THREE.Mesh(
             new THREE.SphereGeometry(
@@ -137,9 +166,17 @@ function createBodies() {
             planetMaterial
         );
         bodies[planet].position.x = (counter * 150) + placeholder;// -window.innerWidth/2 + sun["radius"]*2 + 600;
+        
+        if (rings.hasOwnProperty(planet)) {
+            rings[planet].position.x = (counter * 150) + placeholder;
+        }
+        
         controller["scene"].add( bodies[planet] );
         counter += 1;
     }
+
+    controller["scene"].add(rings["saturn"]);
+    controller["scene"].add(rings["uranus"]);
 }
 
 

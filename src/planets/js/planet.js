@@ -233,7 +233,20 @@ function init () {
     pointLight.position.set(0, 150, 100);
     controller["scene"].add( pointLight );
     
-    //controller["scene"].add( controller["starfield"] );
+    // Starfield example, source: Japh(r)
+    var stars = new THREE.Geometry();
+    for (var i = 0; i < 1000; i++) {
+        stars.vertices.push(
+            new THREE.Vector3(
+                1e3 * Math.random() - 5e2,
+                1e3 * Math.random() - 5e2,
+                -1e2
+            )
+        );
+    }
+    var starMaterial = new THREE.ParticleBasicMaterial();
+    controller["starfield"] = new THREE.ParticleSystem(stars, starMaterial);
+    controller["scene"].add( controller["starfield"] );
 
     createBodies();
 }

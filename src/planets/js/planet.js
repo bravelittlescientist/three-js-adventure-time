@@ -4,6 +4,7 @@ var controller = {
     "renderer"  : null,
     "sphere"    : null,
     "cube"      : null,
+    "starfield" : null
 };
 
 // Sun radius in km, 1 R
@@ -232,5 +233,7 @@ function init () {
     pointLight.position.set(0, 150, 100);
     controller["scene"].add( pointLight );
     
+    //controller["scene"].add( controller["starfield"] );
+
     createBodies();
 }

@@ -62,7 +62,7 @@ var bodies_data = {
     },
     "saturn"    : {
         "toy_radius": 150,
-        "toy_x"     : 400,
+        "toy_x"     : 600,
         "toy_y"     : -200,
         "fromSun" : 1426666422,
         "radius" : 58232,
@@ -70,7 +70,7 @@ var bodies_data = {
     },
     "uranus"    : {
         "toy_radius": 120,
-        "toy_x"     : 500,
+        "toy_x"     : 600,
         "toy_y"     : 150,
         "fromSun" : 2870658186,
         "radius" : 25362,
@@ -78,8 +78,8 @@ var bodies_data = {
     },
     "neptune"   : {
         "toy_radius": 110,
-        "toy_x"     : 700,
-        "toy_y"     : -100,
+        "toy_x"     : 300,
+        "toy_y"     : 400,
         "fromSun" : 4498396441,
         "radius" : 24622,
         "texture"   : "img/neptune.jpg"
@@ -104,18 +104,18 @@ function render() {
     var multiplier = 1;
 
     for (body in bodies) {
-        bodies[body].rotation.x += 0.01;
-        bodies[body].rotation.y += 0.01;
+        //bodies[body].rotation.x += 0.01;
+        //bodies[body].rotation.y += 0.01;
         
         //bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
         //bodies[body].position.z = Math.floor((Math.random()*100) - 50);
         multiplier += 1;
     }
 
-    rings["uranus"].rotation.x += 0.01;
-    rings["uranus"].rotation.z += 0.01;
-    rings["saturn"].rotation.x += 0.01;
-    rings["saturn"].rotation.y -= 0.01;
+    //rings["uranus"].rotation.x += 0.01;
+    //rings["uranus"].rotation.z += 0.01;
+    //rings["saturn"].rotation.x += 0.01;
+    //rings["saturn"].rotation.y -= 0.01;
     
     // Animation Ends
 
@@ -220,8 +220,8 @@ function init () {
     controller["camera"] = new THREE.PerspectiveCamera( 
         45, window.innerWidth / window.innerHeight, 0.1, 20000
     );  
-    controller["camera"].position.set(0, 150, 1000);
-    controller["camera"].lookAt(controller["scene"].position);
+    controller["camera"].position.set(window.innerHeight/2 * -1, 500, 1000);
+    //controller["camera"].lookAt(controller["scene"].position);
 
     // Renderer
     controller["renderer"] = new THREE.WebGLRenderer(); 
@@ -249,4 +249,6 @@ function init () {
     controller["scene"].add( controller["starfield"] );
 
     createBodies();
+
+    controller["camera"].lookAt( bodies["earth"].position );
 }

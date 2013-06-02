@@ -1,11 +1,7 @@
-var controller = {
-    "scene"     : null,
-    "camera"    : null,
-    "renderer"  : null,
-    "sphere"    : null,
-    "cube"      : null,
-    "starfield" : null
-};
+// Global variables
+var scene, camera, renderer, controls;
+var keyboard = new THREEx.KeyboardState();
+var container = document.getElementById('container');
 
 // Sun radius in km, 1 R
 var sun = {
@@ -88,44 +84,83 @@ var bodies_data = {
 
 var bodies = {};
 
+// Initializaton and animation
 init();
+animate();
 
-// render
-// A three-js render loop; draws 60x/s
-function render() {
-    // Render scene
-    window.requestAnimationFrame(render);
+function init () {
 
-    // Animation Starts
-   
+    // Scene
+    scene = new THREE.Scene(); 
+    
+    // Camera
+    camera = new THREE.PerspectiveCamera( 
+        45, window.innerWidth / window.innerHeight, 0.1, 20000
+    );  
+    camera.position.set(window.innerHeight/2 * -1, 500, 1000);
+    camera.lookAt(scene.position);
+
+    // Planet View Controls
+	// move mouse and: left   click (or hold 'A') to rotate, 
+	//                 middle click (or hold 'S') to zoom, 
+	//                 right  click (or hold 'D') to pan
+	controls = new THREE.TrackballControls( camera );
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({antialias : true}); 
+    renderer.setSize( window.innerWidth, window.innerHeight );  
+    container.appendChild( renderer.domElement );
+  
+    // Light Sources and Starfield
+    var pointLight = new THREE.PointLight(0xFFFFFF);
+    pointLight.position.set(0, 150, 100);
+    scene.add( pointLight );
+    
+    // Starfield example, source: Japh(r)
+    var stars = new THREE.Geometry();
+    for (var i = 0; i < 1000; i++) {
+        stars.vertices.push(
+            new THREE.Vector3(
+                1e3 * Math.random() - 5e2,
+                1e3 * Math.random() - 5e2,
+                -1e2
+            )
+        );
+    }
+    var starMaterial = new THREE.ParticleBasicMaterial();
+    starfield = new THREE.ParticleSystem(stars, starMaterial);
+    scene.add( starfield );
+
+    // Create planetary bodies
+    createBodies();
+}
+
+function animate() 
+{
+    requestAnimationFrame( animate );
+	render();		
+	update();
+}
+
+function update()
+{
+	controls.update();
+}
+
+function render() 
+{	
     sun["display"].rotation.x += 0.01;
     sun["display"].rotation.y += 0.01;
 
-    var multiplier = 1;
-
     for (body in bodies) {
-        //bodies[body].rotation.x += 0.01;
-        //bodies[body].rotation.y += 0.01;
-        
-        //bodies[body].position.x = Math.floor((Math.random()*window.innerWidth) - window.innerWidth/2);
-        //bodies[body].position.z = Math.floor((Math.random()*100) - 50);
-        multiplier += 1;
+        bodies[body].rotation.x += 0.01;
+        bodies[body].rotation.y += 0.01;
+
+        //.position.x,y,z
     }
 
-    //rings["uranus"].rotation.x += 0.01;
-    //rings["uranus"].rotation.z += 0.01;
-    //rings["saturn"].rotation.x += 0.01;
-    //rings["saturn"].rotation.y -= 0.01;
-    
-    // Animation Ends
-
-    controller["renderer"].render(
-        controller["scene"],
-        controller["camera"]);
-
-} 
-render();
-
+	renderer.render( scene, camera );
+}
 
 // createPlanets
 // Initializes planets of relatively correct size
@@ -150,12 +185,12 @@ function createBodies() {
     );
     sun["display"].position.set(-1 * window.innerWidth/2 - 200, -1 * window.innerHeight/2 + 50 - 200, 0);
     
-    controller["scene"].add(sun["display"]);
+    scene.add(sun["display"]);
     var sunPL = new THREE.PointLight(0xFFFFFF);
     sunPL.position.x = window.innerWidth/2*-1;
     sunPL.position.y = 10;
     sunPL.position.z = 1050;
-    controller["scene"].add( sunPL );
+    scene.add( sunPL );
 
     // Create planets and rings
     var counter = 1;
@@ -199,56 +234,11 @@ function createBodies() {
             rings[planet].position.y = bodies_data[planet]["toy_y"];
         }
         
-        controller["scene"].add( bodies[planet] );
+        scene.add( bodies[planet] );
         counter += 1;
     }
 
-    controller["scene"].add(rings["saturn"]);
-    controller["scene"].add(rings["uranus"]);
+    scene.add(rings["saturn"]);
+    scene.add(rings["uranus"]);
 }
 
-
-// createScene
-// Loads a THREE.js scene, perspective camera, and renderer into canvas.
-// Currently adds a sphere
-function init () {
-
-    // Scene
-    controller["scene"] = new THREE.Scene(); 
-    
-    // Camera
-    controller["camera"] = new THREE.PerspectiveCamera( 
-        45, window.innerWidth / window.innerHeight, 0.1, 20000
-    );  
-    controller["camera"].position.set(window.innerHeight/2 * -1, 500, 1000);
-    //controller["camera"].lookAt(controller["scene"].position);
-
-    // Renderer
-    controller["renderer"] = new THREE.WebGLRenderer(); 
-    controller["renderer"].setSize( window.innerWidth, window.innerHeight );  
-    document.body.appendChild( controller["renderer"].domElement );
-  
-    // Light Sources and Starfield
-    var pointLight = new THREE.PointLight(0xFFFFFF);
-    pointLight.position.set(0, 150, 100);
-    controller["scene"].add( pointLight );
-    
-    // Starfield example, source: Japh(r)
-    var stars = new THREE.Geometry();
-    for (var i = 0; i < 1000; i++) {
-        stars.vertices.push(
-            new THREE.Vector3(
-                1e3 * Math.random() - 5e2,
-                1e3 * Math.random() - 5e2,
-                -1e2
-            )
-        );
-    }
-    var starMaterial = new THREE.ParticleBasicMaterial();
-    controller["starfield"] = new THREE.ParticleSystem(stars, starMaterial);
-    controller["scene"].add( controller["starfield"] );
-
-    createBodies();
-
-    controller["camera"].lookAt( bodies["earth"].position );
-}
